@@ -10,5 +10,8 @@ api_platform:
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
     formats:
-        jsonld: ['application/ld+json']
+        sonld: ['application/ld+json']
         json: ['application/json']
+        multipart: ['multipart/form-data']
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity']
