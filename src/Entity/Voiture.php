@@ -26,7 +26,7 @@ class Voiture
 
     #[ORM\ManyToOne(inversedBy: 'voitures')]
     #[Groups(['voiture:read', 'voiture:write'])]
-    private ?Modele $Modele = null;
+    private ?Modele $modele = null;
 
     #[ORM\Column]
     #[Groups(['voiture:read', 'voiture:write'])]
@@ -63,12 +63,12 @@ class Voiture
 
     public function getModele(): ?Modele
     {
-        return $this->Modele;
+        return $this->modele;
     }
 
-    public function setModele(?Modele $Modele): static
+    public function setModele(?Modele $modele): static
     {
-        $this->Modele = $Modele;
+        $this->modele = $modele;
 
         return $this;
     }
