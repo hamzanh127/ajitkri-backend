@@ -1,0 +1,36 @@
+ // creation projet et package 
+
+composer create-project symfony/skeleton mon_backend_voiture
+cd mon_backend_voiture
+composer require api
+composer require symfony/orm-pack
+composer require symfony/maker-bundle --dev
+composer require symfony/serializer-pack
+composer require symfony/validator
+composer require doctrine/doctrine-fixtures-bundle --dev
+
+// creation entite 
+
+php bin/console make:entity Marque
+# nom : string
+
+php bin/console make:entity Modele
+# nom : string
+# marque : relation ManyToOne vers Marque
+
+php bin/console make:entity Voiture
+# nom : string
+# marque : relation ManyToOne vers Marque
+# modele : relation ManyToOne vers Modele
+# annee : integer
+# prix : float
+# description : text
+# image : string
+
+// migration 
+
+php bin/console doctrine:database:create
+php bin/console make:migration
+php bin/console doctrine:migrations:migrate
+
+
