@@ -5,15 +5,15 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
-use App\Dto\VoitureInput;
 use App\Repository\VoitureRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: VoitureRepository::class)]
 #[ApiResource(
-    input: VoitureInput::class,
-    inputFormats: ['multipart' => ['multipart/form-data']],
+   
     normalizationContext: ['groups' => ['voiture:read']],
     denormalizationContext: ['groups' => ['voiture:write']]
 )]
@@ -48,6 +48,17 @@ class Voiture
     #[ORM\ManyToOne(inversedBy: 'voitures')]
     #[Groups(['voiture:read', 'voiture:write'])]
     private ?Marque $marque = null;
+
+    /**
+     * @var Collection<int, Image>
+     */
+    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'voiture')]
+    private Collection $images;
+
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -122,6 +133,36 @@ class Voiture
     public function setMarque(?Marque $marque): static
     {
         $this->marque = $marque;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setVoiture($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(Image $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getVoiture() === $this) {
+                $image->setVoiture(null);
+            }
+        }
 
         return $this;
     }

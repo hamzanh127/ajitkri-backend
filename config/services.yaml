@@ -6,28 +6,7 @@
 parameters:
 
 services:
-    App\Serializer\MultipartDecoder:
-        tags: [ 'serializer.encoder' ]
     
-    App\DataTransformer\VoitureInputDataTransformer:
-        arguments:
-            $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
-        tags: [ 'api_platform.state_processor' ]
-
-    # App\DataTransformer\VoitureInputDataTransformer:
-    #     arguments:
-    #         $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
-    #     tags: [ 'api_platform.state_processor' ]
-        
-    # App\Serializer\MultipartFormDataDenormalizer:
-    #     tags: [ 'serializer.normalizer' ]
-
-    # App\DataTransformer\VoitureInputDataTransformer:
-    #     arguments:
-    #         $em: '@doctrine.orm.entity_manager'
-    #         $slugger: '@slugger'
-    #     tags:
-    #         - { name: 'api_platform.data_transformer' }
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
