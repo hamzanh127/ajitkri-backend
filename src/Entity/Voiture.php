@@ -3,19 +3,21 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Post;
 use App\Repository\VoitureRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: VoitureRepository::class)]
 #[ApiResource(
-   
     normalizationContext: ['groups' => ['voiture:read']],
-    denormalizationContext: ['groups' => ['voiture:write']]
+    denormalizationContext: ['groups' => ['voiture:write']],
+    inputFormats: ['multipart' => ['multipart/form-data']]
 )]
 class Voiture
 {
@@ -35,29 +37,41 @@ class Voiture
 
     #[ORM\Column]
     #[Groups(['voiture:read', 'voiture:write'])]
-    private ?int $prix = null;
+    private ?string $prix = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['voiture:read', 'voiture:write'])]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['voiture:read', 'voiture:write'])]
-    private ?string $image = null;
+    
 
     #[ORM\ManyToOne(inversedBy: 'voitures')]
     #[Groups(['voiture:read', 'voiture:write'])]
     private ?Marque $marque = null;
 
-    /**
-     * @var Collection<int, Image>
-     */
-    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'voiture')]
-    private Collection $images;
+    #[ORM\Column(length: 255, nullable: true)]
+#[Groups(['voiture:read'])]
+private ?string $image = null;
 
-    public function __construct()
+#[Vich\UploadableField(mapping: 'Voitures', fileNameProperty: 'image')]
+#[Groups(['voiture:write'])]
+private ?File $imageFile = null;
+
+#[ORM\Column(type: 'datetime', nullable: true)]
+private ?\DateTimeInterface $updatedAt = null;
+ 
+public function setImageFile(?File $imageFile = null): void
+{
+    $this->imageFile = $imageFile;
+
+    if ($imageFile !== null) {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+}
+
+    public function getImageFile(): ?File
     {
-        $this->images = new ArrayCollection();
+        return $this->imageFile;
     }
 
     public function getId(): ?int
@@ -137,33 +151,4 @@ class Voiture
         return $this;
     }
 
-    /**
-     * @return Collection<int, Image>
-     */
-    public function getImages(): Collection
-    {
-        return $this->images;
-    }
-
-    public function addImage(Image $image): static
-    {
-        if (!$this->images->contains($image)) {
-            $this->images->add($image);
-            $image->setVoiture($this);
-        }
-
-        return $this;
-    }
-
-    public function removeImage(Image $image): static
-    {
-        if ($this->images->removeElement($image)) {
-            // set the owning side to null (unless already changed)
-            if ($image->getVoiture() === $this) {
-                $image->setVoiture(null);
-            }
-        }
-
-        return $this;
-    }
 }
