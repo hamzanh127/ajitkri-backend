@@ -5,6 +5,12 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\ModeleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,8 +20,16 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: ModeleRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['modele:read']],
-    denormalizationContext: ['groups' => ['modele:write']]
+    normalizationContext: ['groups' => ['modele:read','modele:marque-read']],
+    denormalizationContext: ['groups' => ['modele:write']],
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['marque' => 'exact'])]
 class Modele
@@ -23,15 +37,16 @@ class Modele
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['modele:read', 'voiture:read'])]
+    #[Groups(['modele:read', 'voiture:read','marque:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['modele:read', 'modele:write', 'voiture:read'])]
+    #[Groups(['modele:read', 'modele:write', 'voiture:read','marque:read'])]
     private ?string $nom = null;
 
     #[ORM\ManyToOne(inversedBy: 'modeles')]
-    #[Groups(['modele:read', 'modele:write', 'voiture:read'])]
+    #[Groups(['modele:read', 'modele:write', 'voiture:read','modele:marque-read'])]
+    #[MaxDepth(2)]
     private ?Marque $marque = null;
 
     /**
